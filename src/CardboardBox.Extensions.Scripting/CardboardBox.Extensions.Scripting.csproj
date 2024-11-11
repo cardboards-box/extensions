@@ -15,11 +15,9 @@
 		<RepositoryUrl>https://github.com/cardboards-box/extensions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>extensions;ext;cardboardbox;aspnetcore;api;jwt</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
-
-	<ItemGroup>
-	  <PackageReference Include="Jint" Version="4.1.0" />
-	</ItemGroup>
 
 	<ItemGroup>
 		<None Include="..\..\icon.jpg" Link="icon.jpg">
@@ -29,7 +27,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Update="README.md">
+		<PackageReference Include="Jint" Version="4.1.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Include="README.md">
 			<PackagePath>\</PackagePath>
 			<Pack>True</Pack>
 		</None>

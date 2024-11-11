@@ -15,7 +15,16 @@
 		<RepositoryUrl>https://github.com/cardboards-box/extensions</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
 		<PackageTags>extensions;ext;cardboardbox;excel;npoi</PackageTags>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<None Include="..\..\icon.jpg" Link="icon.jpg">
+			<PackagePath>\</PackagePath>
+			<Pack>True</Pack>
+		</None>
+	</ItemGroup>
 
 	<ItemGroup>
 	  <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="8.0.1" />
@@ -27,14 +36,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Include="..\..\icon.jpg" Link="icon.jpg">
-			<PackagePath>\</PackagePath>
-			<Pack>True</Pack>
-		</None>
-	</ItemGroup>
-
-	<ItemGroup>
-		<None Update="README.md">
+		<None Include="README.md">
 			<PackagePath>\</PackagePath>
 			<Pack>True</Pack>
 		</None>
