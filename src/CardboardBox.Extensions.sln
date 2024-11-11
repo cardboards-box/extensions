@@ -5,11 +5,16 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardboardBox.Extensions", "CardboardBox.Extensions\CardboardBox.Extensions.csproj", "{699E0F6C-11D0-4643-A854-11EF734090F4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardboardBox.Extensions.Excel", "CardboardBox.Extensions.Excel\CardboardBox.Extensions.Excel.csproj", "{E8CBAA6D-3449-41B6-90EB-526268E6599E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardboardBox.Extensions.Excel", "CardboardBox.Extensions.Excel\CardboardBox.Extensions.Excel.csproj", "{E8CBAA6D-3449-41B6-90EB-526268E6599E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardboardBox.Extensions.Scripting", "CardboardBox.Extensions.Scripting\CardboardBox.Extensions.Scripting.csproj", "{4E01E267-CB98-492A-A1FC-67C1993D542D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardboardBox.Extensions.Scripting", "CardboardBox.Extensions.Scripting\CardboardBox.Extensions.Scripting.csproj", "{4E01E267-CB98-492A-A1FC-67C1993D542D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CardboardBox.Extensions.AspNetCore", "CardboardBox.Extensions.AspNetCore\CardboardBox.Extensions.AspNetCore.csproj", "{CE252111-8CDB-493E-B572-542ADAB3830E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CardboardBox.Extensions.AspNetCore", "CardboardBox.Extensions.AspNetCore\CardboardBox.Extensions.AspNetCore.csproj", "{CE252111-8CDB-493E-B572-542ADAB3830E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{7532E934-ABAC-4C93-B97D-8B235B476229}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\main.yml = ..\.github\workflows\main.yml
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
