@@ -34,7 +34,7 @@ jobs:
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
      
       - name: Publish Excel Extensions Nuget Package
-        id: publish_nuget_extensions_aspnetcore
+        id: publish_nuget_extensions_excel
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           PROJECT_FILE_PATH: src/CardboardBox.Extensions.Excel/CardboardBox.Extensions.Excel.csproj
