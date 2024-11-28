@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Version>2.0.0</Version>
+		<Version>2.0.1</Version>
 		<Company>Cardboard</Company>
 		<Product>CardboardBox.Extensions</Product>
 		<Authors>Cardboard</Authors>

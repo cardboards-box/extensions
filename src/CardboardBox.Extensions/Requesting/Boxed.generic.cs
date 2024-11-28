@@ -10,7 +10,16 @@ public class Boxed<T> : Boxed
     /// The result of the request
     /// </summary>
     [JsonPropertyName("data")]
-    public T Data { get; set; }
+    public T? Data { get; set; }
+
+    /// <summary>
+    /// Represents the result of a successful API call that returns data
+    /// </summary>
+    [JsonConstructor]
+    public Boxed() : base()
+    {
+        Data = default;
+    }
 
     /// <summary>
     /// Represents the result of a successful API call that returns data

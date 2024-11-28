@@ -30,7 +30,7 @@ jobs:
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           PROJECT_FILE_PATH: src/CardboardBox.Extensions.AspNetCore/CardboardBox.Extensions.AspNetCore.csproj
-          TAG_COMMIT: true
+          TAG_COMMIT: false
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
      
       - name: Publish Excel Extensions Nuget Package
@@ -38,7 +38,7 @@ jobs:
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           PROJECT_FILE_PATH: src/CardboardBox.Extensions.Excel/CardboardBox.Extensions.Excel.csproj
-          TAG_COMMIT: true
+          TAG_COMMIT: false
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}
      
       - name: Publish Scripting Extensions Nuget Package
@@ -46,5 +46,5 @@ jobs:
         uses: alirezanet/publish-nuget@v3.0.4
         with:
           PROJECT_FILE_PATH: src/CardboardBox.Extensions.Scripting/CardboardBox.Extensions.Scripting.csproj
-          TAG_COMMIT: true
+          TAG_COMMIT: false
           NUGET_KEY: ${{secrets.NUGET_API_KEY}}

@@ -25,4 +25,10 @@ public class BoxedPaged<T>(
     /// </summary>
     [JsonPropertyName("total")]
     public int Total { get; set; } = total;
+
+    /// <summary>
+    /// Represents the result of a successful API call that returns paged data
+    /// </summary>
+    [JsonConstructor]
+    public BoxedPaged() : this([], 0, 0) { }
 }

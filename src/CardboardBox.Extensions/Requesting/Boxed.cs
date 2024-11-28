@@ -40,13 +40,25 @@ public class Boxed
     /// The boxed code for the result
     /// </summary>
     [JsonPropertyName("type")]
-    public string Type { get; set; }
+    public string Type { get; set; } = OK;
 
     /// <summary>
     /// The HTTP status code for the result
     /// </summary>
     [JsonPropertyName("code")]
     public int Code { get; set; }
+
+    /// <summary>
+    /// A brief description of the error
+    /// </summary>
+    [JsonPropertyName("description")]
+    public string? Description { get; set; }
+
+    /// <summary>
+    /// Any issues that occurred
+    /// </summary>
+    [JsonPropertyName("errors")]
+    public string[]? Errors { get; set; }
 
     /// <summary>
     /// Whether or not the result was successful
@@ -59,6 +71,12 @@ public class Boxed
     /// </summary>
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
     public double? Elapsed { get; set; }
+
+    /// <summary>
+    /// Represents the base return result for all API calls
+    /// </summary>
+    [JsonConstructor]
+    public Boxed() { }
 
     /// <summary>
     /// Represents the base return result for all API calls
