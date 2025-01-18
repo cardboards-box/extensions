@@ -3,6 +3,9 @@
 /// <summary>
 /// Wrapper for working with Excel. Works with HSSF (1997 Excel) or XSSF (2000+ Excel)
 /// </summary>
+/// <remarks>
+/// Load Excel document from Workbook
+/// </remarks>
 /// <param name="book">Book to use</param>
 public class ExcelWrapper(IWorkbook book) : IDisposable
 {
@@ -196,6 +199,18 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     }
 
     /// <summary>
+    /// Get the last cell index from the given sheet
+    /// </summary>
+    /// <param name="sheet">The sheet</param>
+    /// <returns>The last cell index from the last row in the sheet</returns>
+    public static int LastCellIndex(ISheet sheet)
+    {
+        var r = sheet.GetRow(sheet.LastRowNum);
+        var c = r.LastCellNum - 1;
+        return c;
+    }
+
+    /// <summary>
     /// Chained Method
     /// Automatically sets the first row of the specified sheet index to being filtered.
     /// </summary>
@@ -219,6 +234,19 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
         var (s, c) = LastCellIndex(sheet);
         s.SetAutoFilter(new CellRangeAddress(0, s.LastRowNum, 0, c));
 
+        return this;
+    }
+
+    /// <summary>
+    /// Chained Method
+    /// Automatically sets the first row of the specified sheet name to being filtered.
+    /// </summary>
+    /// <param name="sheet">The sheet name to set the filters on</param>
+    /// <returns>The current instance of the wrapper (for Chaining)</returns>
+    public ExcelWrapper SetAutoFilters(ISheet sheet)
+    {
+        var c = LastCellIndex(sheet);
+        sheet.SetAutoFilter(new CellRangeAddress(0, sheet.LastRowNum, 0, c));
         return this;
     }
 
@@ -267,6 +295,29 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     }
 
     /// <summary>
+    /// Automatically sets the width of the columns to fit the data specified
+    /// </summary>
+    /// <param name="sheet">The sheet</param>
+    /// <returns>The instance of the wrapper for Chaining</returns>
+    public ExcelWrapper SetAutoWidth(ISheet sheet)
+    {
+        var c = LastCellIndex(sheet);
+
+        for (var i = 0; i <= c; i++)
+        {
+            sheet.AutoSizeColumn(i);
+            var autoWidth = sheet.GetColumnWidth(i);
+            // Leave room for the Filter/Sort button
+            var newWidthWithSorting = autoWidth + 400;
+            // widths are restricted to 255 characters.  Width unit is 1/255 of a character so column width can be maximum of 255 * 255
+            newWidthWithSorting = newWidthWithSorting > 255 * 255 ? 255 * 255 : newWidthWithSorting;
+            sheet.SetColumnWidth(i, newWidthWithSorting);
+        }
+
+        return this;
+    }
+
+    /// <summary>
     /// Generates the memory stream from the Excel Workbook
     /// </summary>
     /// <returns>The memory stream</returns>
@@ -287,7 +338,7 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     public void SaveToFile(string path)
     {
         if (Workbook == null)
-            throw new ArgumentNullException(nameof(Workbook), "Workbook not created.");
+            throw new NullReferenceException($"{nameof(Workbook)} has not been created.");
 
         using var f = File.OpenWrite(path);
         Workbook.Write(f, true);
@@ -301,8 +352,8 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     /// <returns>The contents of the sheet</returns>
     public dynamic[] ReadSheetAsMap(string sheet)
     {
-        var ser = new ExcelParserService();
-        return ser.DeserializeHeaderMap(this, sheet)
+        var parser = new ExcelParserService();
+        return parser.DeserializeHeaderMap(this, sheet)
             .Select(t =>
             {
                 var eo = new ExpandoObject();
@@ -322,8 +373,8 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     /// <returns>The contents of the sheet</returns>
     public dynamic[] ReadSheetAsMap(int sheet)
     {
-        var ser = new ExcelParserService();
-        return ser.DeserializeHeaderMap(this, sheet)
+        var parser = new ExcelParserService();
+        return parser.DeserializeHeaderMap(this, sheet)
             .Select(t =>
             {
                 var eo = new ExpandoObject();
@@ -343,8 +394,8 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     /// <returns>The contents of the sheet</returns>
     public string[][] ReadSheet(string sheet)
     {
-        var ser = new ExcelParserService();
-        return ser.DeserializeIndexMap(this, sheet).ToArray();
+        var parser = new ExcelParserService();
+        return parser.DeserializeIndexMap(this, sheet).ToArray();
     }
 
     /// <summary>
@@ -354,8 +405,42 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     /// <returns>The contents of the sheet</returns>
     public string[][] ReadSheet(int sheet)
     {
-        var ser = new ExcelParserService();
-        return ser.DeserializeIndexMap(this, sheet).ToArray();
+        var parser = new ExcelParserService();
+        return parser.DeserializeIndexMap(this, sheet).ToArray();
+    }
+
+    /// <summary>
+    /// Reads the first record for the spreadsheet
+    /// </summary>
+    /// <param name="sheet">The name of the sheet</param>
+    /// <returns>The header records from the sheet</returns>
+    public string[] ReadSheetHeaders(string sheet)
+    {
+        var item = this[sheet] ?? throw new ArgumentException($"Couldn't find the specified spreadsheet: `{sheet}`", nameof(sheet));
+        return ReadSheetHeaders(item);
+    }
+
+    /// <summary>
+    /// Reads the first record for the spreadsheet
+    /// </summary>
+    /// <param name="sheet">The index of the sheet</param>
+    /// <returns>The header records from the sheet</returns>
+    public string[] ReadSheetHeaders(int sheet)
+    {
+        var item = this[sheet] ?? throw new ArgumentException($"Couldn't find the specified spreadsheet: `{sheet}`", nameof(sheet));
+        return ReadSheetHeaders(item);
+    }
+
+    /// <summary>
+    /// Reads the first record for the spreadsheet
+    /// </summary>
+    /// <param name="sheet">The sheet to read from</param>
+    /// <returns>The header records from the sheet</returns>
+    public static string[] ReadSheetHeaders(ISheet sheet)
+    {
+        var parser = new ExcelParserService();
+        var headerRow = sheet.GetRow(0) ?? throw new ArgumentException("Header row could not be found", nameof(sheet));
+        return headerRow.Select(parser.GetCellStringValue).ToArray();
     }
 
     /// <summary>
@@ -365,7 +450,7 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     /// <param name="col">Column to use</param>
     /// <param name="includeLock">Whether to include the $ between row and column</param>
     /// <returns>The Excel Fen Mapping</returns>
-    private static string RowColToFen(int row, int col, bool includeLock = false)
+    public static string RowColToFen(int row, int col, bool includeLock = false)
     {
         var fen = NumberToExcelColumnName(col);
         return $"{fen}{(includeLock ? "$" : "")}{row}";
@@ -376,7 +461,7 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     /// </summary>
     /// <param name="colRow">The fen mapping</param>
     /// <returns>The row (0) and column (1) </returns>
-    private static int[] FenToRowCol(string colRow)
+    public static int[] FenToRowCol(string colRow)
     {
         var fen = "";
         foreach (var car in colRow)
@@ -389,7 +474,7 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
 
         var col = ExcelColumnNameToNumber(fen.TrimEnd('$')) - 1;
         var row = int.Parse(colRow.Remove(0, fen.Length)) - 1;
-        return [ row, col ];
+        return [row, col];
     }
 
     /// <summary>
@@ -408,7 +493,7 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
         for (int i = 0; i < columnName.Length; i++)
         {
             sum *= 26;
-            sum += columnName[i] - 'A' + 1;
+            sum += (columnName[i] - 'A' + 1);
         }
 
         return sum;
@@ -439,11 +524,11 @@ public class ExcelWrapper(IWorkbook book) : IDisposable
     /// Loads workbook from data stream
     /// </summary>
     /// <param name="dataInput">The input stream</param>
-    /// <param name="xsf">Whether a XSSF or HSSF book</param>
+    /// <param name="xSSF">Whether a XSSF or HSSF book</param>
     /// <returns>The workbook loaded</returns>
-    private static IWorkbook LoadWorkbookFromStream(Stream dataInput, bool xsf = true)
+    private static IWorkbook LoadWorkbookFromStream(Stream dataInput, bool xSSF = true)
     {
-        return xsf ? new XSSFWorkbook(dataInput) : new HSSFWorkbook(dataInput);
+        return xSSF ? new XSSFWorkbook(dataInput) : new HSSFWorkbook(dataInput);
     }
 
     /// <summary>

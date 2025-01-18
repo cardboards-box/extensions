@@ -12,14 +12,16 @@ using Requesting;
 /// An API controller that providers a base for all controllers with handling boxing
 /// </summary>
 /// <param name="logger">The logger to use</param>
+/// <param name="_intercept">The intercept service used to handle requests</param>
 [ApiController]
 public abstract class BaseController(
-    ILogger logger) : ControllerBase
+    ILogger logger,
+    IBoxedRequestInterceptService? _intercept = null) : ControllerBase
 {
     /// <summary>
     /// A request validator for the controller
     /// </summary>
-    public RequestValidator Validator => new();
+    public static RequestValidator Validator => new();
 
     /// <summary>
     /// The logger for the controller
@@ -34,6 +36,11 @@ public abstract class BaseController(
     [NonAction]
     public async Task<IActionResult> Box(Func<Task<Boxed>> action)
     {
+        IActionResult? captured;
+        if (_intercept is not null && 
+            (captured = await _intercept.RequestStarted(this)) is not null)
+            return captured;
+
         var watch = Stopwatch.StartNew();
         var id = Guid.NewGuid();
         Boxed result;
@@ -47,10 +54,21 @@ public abstract class BaseController(
             var url = Request.HttpContext.Features.Get<IHttpRequestFeature>()?.RawTarget ?? Request.GetDisplayUrl();
             Logger.LogError(ex, "Error occurred during request: {id} >> {url}", id, url);
             result = Boxed.Exception(ex);
+            result.Elapsed = watch.Elapsed.TotalMilliseconds;
+            result.RequestId = id;
+
+            if (_intercept is not null &&
+                (captured = await _intercept.RequestFailed(this, ex, result)) is not null)
+                return captured;
         }
 
         result.Elapsed = watch.Elapsed.TotalMilliseconds;
         result.RequestId = id;
+
+        if (_intercept is not null &&
+            (captured = await _intercept.RequestSucceeded(this, result)) is not null)
+            return captured;
+
         return StatusCode(result.Code, result);
     }
 
@@ -96,5 +114,16 @@ public abstract class BaseController(
     public Task<IActionResult> Box<T>(Func<Task<T>> action)
     {
         return Box(() => action().ContinueWith(t => (Boxed)Boxed.Ok(t.Result)));
+    }
+
+    /// <summary>
+    /// Handles a request and boxes the result
+    /// </summary>
+    /// <param name="action">The action to box</param>
+    /// <returns>The boxed result</returns>
+    [NonAction]
+    public Task<IActionResult> Box<T>(Func<Task<Boxed<T>>> action)
+    {
+        return Box(() => action().ContinueWith(t => (Boxed)t.Result));
     }
 }

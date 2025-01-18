@@ -330,4 +330,22 @@ public class RequestValidator
         boxed = Boxed.Bad(Issues);
         return false;
     }
+
+    /// <summary>
+    /// Validates and wraps the result in a boxed result object, returning true if valid.
+    /// </summary>
+    /// <typeparam name="T">The type of data that should be present</typeparam>
+    /// <param name="boxed">The resulting boxed validation outcome.</param>
+    /// <returns>True if validation passed, otherwise false.</returns>
+    public bool Validate<T>(out Boxed<T> boxed)
+    {
+        if (Issues.Count == 0)
+        {
+            boxed = Boxed.Ok(default(T)!);
+            return true;
+        }
+
+        boxed = Boxed.Bad<T>(Issues);
+        return false;
+    }
 }

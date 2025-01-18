@@ -282,5 +282,28 @@ public static class LinqExtensions
         return data.FirstOrDefault();
     }
 
+    /// <summary>
+    /// Get a specific page of results from the given collection
+    /// </summary>
+    /// <typeparam name="T">The type of collection</typeparam>
+    /// <param name="data">The collection</param>
+    /// <param name="page">The page to get</param>
+    /// <param name="size">The size of the page</param>
+    /// <returns>Just the results from the current page</returns>
+    public static IEnumerable<T> Page<T>(this IEnumerable<T> data, int page, int size)
+    {
+        int offset = (page - 1) * size;
+        int current = -1; int count = 0;
+        foreach (var item in data)
+        {
+            current++;
+            if (current < offset) continue;
+            if (count >= size) yield break;
+
+            yield return item;
+            count++;
+        }
+    }
+
     #endregion
 }

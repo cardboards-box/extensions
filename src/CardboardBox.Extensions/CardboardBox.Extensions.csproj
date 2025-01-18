@@ -6,7 +6,7 @@
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Version>2.0.1</Version>
+		<Version>2.0.2</Version>
 		<Company>Cardboard</Company>
 		<Product>CardboardBox.Extensions</Product>
 		<Authors>Cardboard</Authors>
@@ -20,7 +20,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.11.70" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.11.72" />
 		<PackageReference Include="System.Linq.Async" Version="6.0.1" />
 		<PackageReference Include="System.Text.Json" Version="8.0.5" />
 	</ItemGroup>

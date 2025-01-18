@@ -15,6 +15,7 @@ public static class DiExtensions
     public static IServiceCollection AddExcel(this IServiceCollection services)
     {
         return services
-            .AddTransient<IExcelParserService, ExcelParserService>();
+            .AddTransient<IExcelParserService, ExcelParserService>()
+            .AddTransient<IExcelWriterService, ExcelWriterService>();
     }
 }
