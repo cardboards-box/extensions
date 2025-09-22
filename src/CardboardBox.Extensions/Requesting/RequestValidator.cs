@@ -327,7 +327,7 @@ public class RequestValidator
             return true;
         }
 
-        boxed = Boxed.Bad(Issues);
+        boxed = Boxed.Bad([..Issues]);
         return false;
     }
 
@@ -345,7 +345,7 @@ public class RequestValidator
             return true;
         }
 
-        boxed = Boxed.Bad<T>(Issues);
+        boxed = Boxed.Bad<T>([.. Issues]);
         return false;
     }
 }

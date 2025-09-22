@@ -36,8 +36,8 @@ public class ProducesPagedAttribute<T>(int code = 200)
     : ProducesResponseTypeAttribute(typeof(BoxedPaged<T>), code) { }
 
 /// <summary>
-/// Wraps the <see cref="ProducesResponseTypeAttribute"/> for the <see cref="BoxedError"/> types
+/// Wraps the <see cref="ProducesResponseTypeAttribute"/> for the <see cref="Boxed"/> types that result in errors
 /// </summary>
 /// <param name="code">The optional status code of the result</param>
 public class ProducesErrorAttribute(int code = 500)
-    : ProducesResponseTypeAttribute(typeof(BoxedError), code) { }
+    : ProducesResponseTypeAttribute(typeof(Boxed), code) { }

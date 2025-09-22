@@ -61,6 +61,10 @@ public abstract class BaseController(
                 (captured = await _intercept.RequestFailed(this, ex, result)) is not null)
                 return captured;
         }
+        finally
+        {
+            watch.Stop();
+        }
 
         result.Elapsed = watch.Elapsed.TotalMilliseconds;
         result.RequestId = id;
@@ -70,17 +74,6 @@ public abstract class BaseController(
             return captured;
 
         return StatusCode(result.Code, result);
-    }
-
-    /// <summary>
-    /// Handles a request and boxes the result
-    /// </summary>
-    /// <param name="action">The action to box</param>
-    /// <returns>The boxed result</returns>
-    [NonAction]
-    public Task<IActionResult> Box(Func<Boxed> action)
-    {
-        return Box(() => Task.FromResult(action()));
     }
 
     /// <summary>
@@ -102,7 +95,13 @@ public abstract class BaseController(
     [NonAction]
     public Task<IActionResult> Box<T>(Func<T> action)
     {
-        return Box(() => (Boxed)Boxed.Ok(action()));
+        return Box(() => 
+        {
+            var result = action();
+            if (result is Boxed boxed) 
+                return Task.FromResult(boxed);
+            return Task.FromResult((Boxed)Boxed.Ok(result));
+        });
     }
 
     /// <summary>
@@ -113,17 +112,12 @@ public abstract class BaseController(
     [NonAction]
     public Task<IActionResult> Box<T>(Func<Task<T>> action)
     {
-        return Box(() => action().ContinueWith(t => (Boxed)Boxed.Ok(t.Result)));
-    }
-
-    /// <summary>
-    /// Handles a request and boxes the result
-    /// </summary>
-    /// <param name="action">The action to box</param>
-    /// <returns>The boxed result</returns>
-    [NonAction]
-    public Task<IActionResult> Box<T>(Func<Task<Boxed<T>>> action)
-    {
-        return Box(() => action().ContinueWith(t => (Boxed)t.Result));
+        return Box(() => action().ContinueWith(t =>
+        {
+            var result = t.Result;
+            if (result is Boxed boxed)
+                return boxed;
+            return Boxed.Ok(t.Result);
+        }));
     }
 }

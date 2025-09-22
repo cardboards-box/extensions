@@ -6,6 +6,31 @@
 public class Boxed
 {
     /// <summary>
+    /// The error message for 500 errors
+    /// </summary>
+    public static string ErrorMessage500 { get; set; } = "500 - An error occurred";
+
+    /// <summary>
+    /// The error message for 404 errors
+    /// </summary>
+    public static string ErrorMessage404 { get; set; } = "404 - Something is missing";
+
+    /// <summary>
+    /// The error message for 401 errors
+    /// </summary>
+    public static string ErrorMessage401 { get; set; } = "401 - Unauthorized";
+
+    /// <summary>
+    /// The error message for 400 errors
+    /// </summary>
+    public static string ErrorMessage400 { get; set; } = "400 - User input is bad";
+
+    /// <summary>
+    /// The error message for 409 errors
+    /// </summary>
+    public static string ErrorMessage409 { get; set; } = "409 - Already exists";
+
+    /// <summary>
     /// Result was successful and contained no data
     /// </summary>
     public const string OK = "ok";
@@ -181,13 +206,85 @@ public class Boxed
     }
 
     /// <summary>
+    /// Creates an error result
+    /// </summary>
+    /// <param name="code">The status code for the result</param>
+    /// <param name="description">The description of what happened</param>
+    /// <param name="errors">The error messages included in the response</param>
+    /// <returns>The error result</returns>
+    public static Boxed Error(HttpStatusCode code, string description, params string[] errors)
+    {
+        return new Boxed
+        {
+            Code = (int)code,
+            Type = ERROR,
+            Description = description,
+            Errors = errors
+        };
+    }
+
+    /// <summary>
+    /// Creates an error result
+    /// </summary>
+    /// <param name="code">The status code for the result</param>
+    /// <param name="description">The description of what happened</param>
+    /// <param name="errors">The error messages included in the response</param>
+    /// <returns>The error result</returns>
+    public static Boxed Error(HttpStatusCode code, string description, params Exception[] errors)
+    {
+        return new Boxed
+        {
+            Code = (int)code,
+            Type = ERROR,
+            Description = description,
+            Errors = [..errors.Select(e => e.Message)]
+        };
+    }
+
+    /// <summary>
+    /// Creates an error result
+    /// </summary>
+    /// <param name="code">The status code for the result</param>
+    /// <param name="description">The description of what happened</param>
+    /// <param name="errors">The error messages included in the response</param>
+    /// <returns>The error result</returns>
+    public static Boxed<T> Error<T>(HttpStatusCode code, string description, params string[] errors)
+    {
+        return new Boxed<T>
+        {
+            Code = (int)code,
+            Type = ERROR,
+            Description = description,
+            Errors = errors
+        };
+    }
+
+    /// <summary>
+    /// Creates an error result
+    /// </summary>
+    /// <param name="code">The status code for the result</param>
+    /// <param name="description">The description of what happened</param>
+    /// <param name="errors">The error messages included in the response</param>
+    /// <returns>The error result</returns>
+    public static Boxed<T> Error<T>(HttpStatusCode code, string description, params Exception[] errors)
+    {
+        return new Boxed<T>
+        {
+            Code = (int)code,
+            Type = ERROR,
+            Description = description,
+            Errors = [.. errors.Select(e => e.Message)]
+        };
+    }
+
+    /// <summary>
     /// An exception occurred
     /// </summary>
     /// <param name="errors">The error(s) that occurred</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError Exception(params string[] errors)
+    public static Boxed Exception(params string[] errors)
     {
-        return new BoxedError("500 - An error occurred", errors);
+        return Error(HttpStatusCode.InternalServerError, ErrorMessage500, errors);
     }
 
     /// <summary>
@@ -195,9 +292,9 @@ public class Boxed
     /// </summary>
     /// <param name="exceptions">The error(s) that occurred</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError Exception(params Exception[] exceptions)
+    public static Boxed Exception(params Exception[] exceptions)
     {
-        return new BoxedError("500 - An error occurred", exceptions.Select(e => e.Message).ToArray());
+        return Exception(exceptions.Select(e => e.Message).ToArray());
     }
 
     /// <summary>
@@ -206,9 +303,9 @@ public class Boxed
     /// <typeparam name="T">The type of data that should be present</typeparam>
     /// <param name="errors">The error(s) that occurred</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError<T> Exception<T>(params string[] errors)
+    public static Boxed<T> Exception<T>(params string[] errors)
     {
-        return new BoxedError<T>("500 - An error occurred", errors);
+        return Error<T>(HttpStatusCode.InternalServerError, ErrorMessage500, errors);
     }
 
     /// <summary>
@@ -217,9 +314,9 @@ public class Boxed
     /// <typeparam name="T">The type of data that should be present</typeparam>
     /// <param name="exceptions">The error(s) that occurred</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError<T> Exception<T>(params Exception[] exceptions)
+    public static Boxed<T> Exception<T>(params Exception[] exceptions)
     {
-        return new BoxedError<T>("500 - An error occurred", exceptions.Select(e => e.Message).ToArray());
+        return Exception<T>(exceptions.Select(e => e.Message).ToArray());
     }
 
     /// <summary>
@@ -228,9 +325,9 @@ public class Boxed
     /// <param name="resource">The resource that was missing</param>
     /// <param name="errors">Any other issues that occurred</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError NotFound(string resource, params string[] errors)
+    public static Boxed NotFound(string resource, params string[] errors)
     {
-        return new BoxedError(HttpStatusCode.NotFound, "404 - Something is missing", [$"The requested resource '{resource}' was not found", .. errors]);
+        return Error(HttpStatusCode.NotFound, ErrorMessage404, [$"The requested resource '{resource}' was not found", .. errors]);
     }
 
     /// <summary>
@@ -240,9 +337,9 @@ public class Boxed
     /// <param name="resource">The resource that was missing</param>
     /// <param name="errors">Any other issues that occurred</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError<T> NotFound<T>(string resource, params string[] errors)
+    public static Boxed<T> NotFound<T>(string resource, params string[] errors)
     {
-        return new BoxedError<T>(HttpStatusCode.NotFound, "404 - Something is missing", [$"The requested resource '{resource}' was not found", .. errors]);
+        return Error<T>(HttpStatusCode.NotFound, ErrorMessage404, [$"The requested resource '{resource}' was not found", .. errors]);
     }
 
     /// <summary>
@@ -250,9 +347,9 @@ public class Boxed
     /// </summary>
     /// <param name="issues">Any issues that occurred that caused the unauthorized error</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError Unauthorized(params string[] issues)
+    public static Boxed Unauthorized(params string[] issues)
     {
-        return new BoxedError(HttpStatusCode.Unauthorized, "401 - Unauthorized", ["You are not authorized to access this resource", .. issues]);
+        return Error(HttpStatusCode.Unauthorized, ErrorMessage401, ["You are not authorized to access this resource", .. issues]);
     }
 
     /// <summary>
@@ -261,9 +358,9 @@ public class Boxed
     /// <typeparam name="T">The type of data that should be present</typeparam>
     /// <param name="issues">Any issues that occurred that caused the unauthorized error</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError<T> Unauthorized<T>(params string[] issues)
+    public static Boxed<T> Unauthorized<T>(params string[] issues)
     {
-        return new BoxedError<T>(HttpStatusCode.Unauthorized, "401 - Unauthorized", ["You are not authorized to access this resource", .. issues]);
+        return Error<T>(HttpStatusCode.Unauthorized, ErrorMessage401, ["You are not authorized to access this resource", .. issues]);
     }
 
     /// <summary>
@@ -271,9 +368,9 @@ public class Boxed
     /// </summary>
     /// <param name="errors">The different errors</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError Bad(params string[] errors)
+    public static Boxed Bad(params string[] errors)
     {
-        return new BoxedError(HttpStatusCode.BadRequest, "400 - User input is bad", errors);
+        return Error(HttpStatusCode.BadRequest, ErrorMessage400, errors);
     }
 
     /// <summary>
@@ -282,34 +379,19 @@ public class Boxed
     /// <typeparam name="T">The type of data that should be present</typeparam>
     /// <param name="errors">The different errors</param>
     /// <returns>The returned error result</returns>
-    public static BoxedError<T> Bad<T>(params string[] errors)
+    public static Boxed<T> Bad<T>(params string[] errors)
     {
-        return new BoxedError<T>(HttpStatusCode.BadRequest, "400 - User input is bad", errors);
+        return Error<T>(HttpStatusCode.BadRequest, ErrorMessage400, errors);
     }
-
-    /// <summary>
-    /// Something the user did was bad
-    /// </summary>
-    /// <param name="errors">The different errors</param>
-    /// <returns>The returned error result</returns>
-    public static BoxedError Bad(IEnumerable<string> errors) => Bad(errors.ToArray());
-
-    /// <summary>
-    /// Something the user did was bad
-    /// </summary>
-    /// <typeparam name="T">The type of data that should be present</typeparam>
-    /// <param name="errors">The different errors</param>
-    /// <returns>The returned error result</returns>
-    public static BoxedError<T> Bad<T>(IEnumerable<string> errors) => Bad<T>(errors.ToArray());
 
     /// <summary>
     /// Resource already exists
     /// </summary>
     /// <param name="resource">The resource that was conflicting</param>
     /// <returns>The result of the request</returns>
-    public static BoxedError Conflict(string resource)
+    public static Boxed Conflict(string resource)
     {
-        return new BoxedError(HttpStatusCode.Conflict, "409 - Already exists", $"The resource '{resource}' already exists");
+        return Error(HttpStatusCode.Conflict, ErrorMessage409, $"The resource '{resource}' already exists");
     }
 
     /// <summary>
@@ -318,8 +400,8 @@ public class Boxed
     /// <typeparam name="T">The type of data that should be present</typeparam>
     /// <param name="resource">The resource that was conflicting</param>
     /// <returns>The result of the request</returns>
-    public static BoxedError<T> Conflict<T>(string resource)
+    public static Boxed<T> Conflict<T>(string resource)
     {
-        return new BoxedError<T>(HttpStatusCode.Conflict, "409 - Already exists", $"The resource '{resource}' already exists");
+        return Error<T>(HttpStatusCode.Conflict, ErrorMessage409, $"The resource '{resource}' already exists");
     }
 }
