@@ -9,9 +9,10 @@ namespace CardboardBox.Extensions.Utilities.TimeUnits;
 /// <param name="Type">The type of unit of time</param>
 /// <param name="Value">The value of the time unit</param>
 [JsonConverter(typeof(TimeUnitSerializer))]
-public record struct TimeUnit(
-	TimeUnitType Type,
-	double Value) : IParsable<TimeUnit>
+public record struct TimeUnit(TimeUnitType Type, double Value)
+#if NET10_0_OR_GREATER
+	: IParsable<TimeUnit>
+#endif
 {
 	private static TimeUnitMap[]? _units;
 

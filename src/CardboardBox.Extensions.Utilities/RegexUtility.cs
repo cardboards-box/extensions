@@ -41,9 +41,20 @@ public static partial class RegexUtility
 		return (value, unit);
 	}
 
-	[GeneratedRegex("[^a-zA-Z0-9\\.%-]", RegexOptions.Compiled)]
+	// language=regex
+	private const string UnitFilterPattern = @"[^a-zA-Z0-9\.%-]";
+	// language=regex
+	private const string UnitParserPattern = @"(-?[0-9]{0,}\.?[0-9]{0,}?)([a-z%]{1,})?$";
+
+#if NETSTANDARD2_1
+	private static Regex UnitFilterRegex() => new(UnitFilterPattern, RegexOptions.Compiled);
+
+	private static Regex UnitParserRegex() => new(UnitParserPattern, RegexOptions.Compiled);
+#else
+	[GeneratedRegex(UnitFilterPattern, RegexOptions.Compiled)]
 	private static partial Regex UnitFilterRegex();
 
-	[GeneratedRegex("(-?[0-9]{0,}\\.?[0-9]{0,}?)([a-z%]{1,})?$", RegexOptions.Compiled)]
+	[GeneratedRegex(UnitParserPattern, RegexOptions.Compiled)]
 	private static partial Regex UnitParserRegex();
+#endif
 }

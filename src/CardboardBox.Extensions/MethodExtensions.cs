@@ -17,8 +17,7 @@ public static class MethodExtensions
         return () =>
         {
             var current = Interlocked.Increment(ref last);
-            Task
-                .Delay(milliseconds)
+            Task.Delay(milliseconds)
                 .ContinueWith(task =>
                 {
                     if (current == last) func();
@@ -40,8 +39,7 @@ public static class MethodExtensions
         return (arg) =>
         {
             var current = Interlocked.Increment(ref last);
-            Task
-                .Delay(milliseconds)
+            Task.Delay(milliseconds)
                 .ContinueWith(task =>
                 {
                     if (current == last) func(arg);

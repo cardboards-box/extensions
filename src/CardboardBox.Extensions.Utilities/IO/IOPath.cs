@@ -89,7 +89,12 @@ public record struct IOPath(string Value)
 		{ Uri.UriSchemeHttp, IOPathType.REMOTE_HTTP },
 		{ Uri.UriSchemeHttps, IOPathType.REMOTE_HTTP },
 		{ Uri.UriSchemeFtp, IOPathType.REMOTE_FTP },
+		{ Uri.UriSchemeFile, IOPathType.LOCAL_ABSOLUTE },
+#if NET10_0_OR_GREATER
 		{ Uri.UriSchemeFtps, IOPathType.REMOTE_FTP },
+#else
+		{ "ftps", IOPathType.REMOTE_FTP },
+#endif
 		{ Uri.UriSchemeFile, IOPathType.LOCAL_ABSOLUTE },
 		{ "rsc", IOPathType.CACHE }
 	};
@@ -162,16 +167,6 @@ public record struct IOPath(string Value)
 	}
 
 	/// <summary>
-	/// Gets the file extension based on the mime type
-	/// </summary>
-	/// <param name="mimeType">The mime type</param>
-	/// <returns>The file extension</returns>
-	public static string DetermineExtension(string mimeType)
-	{
-		return MimeTypes.GetMimeTypeExtensions(mimeType).FirstOrDefault() ?? "zip";
-	}
-
-	/// <summary>
 	/// Creates a random directory in the temp file paths
 	/// </summary>
 	/// <returns>The file path</returns>
@@ -181,5 +176,5 @@ public record struct IOPath(string Value)
 		if (!Directory.Exists(path)) Directory.CreateDirectory(path);
 		return path;
 	}
-	#endregion
+#endregion
 }

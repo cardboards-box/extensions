@@ -11,9 +11,10 @@ using static PixelConversions;
 /// <param name="Type">The type of unit of measurement</param>
 /// <param name="Value">The value of the measurement</param>
 [JsonConverter(typeof(SizeUnitSerializer))]
-public record struct SizeUnit(
-	SizeUnitType Type,
-	double Value) : IParsable<SizeUnit>
+public record struct SizeUnit(SizeUnitType Type, double Value)
+#if NET10_0_OR_GREATER
+	: IParsable<SizeUnit>
+#endif
 {
 	private static SizeUnitMap[]? _units;
 	private const string ERROR_PERCENT = "Cannot use percentage measurement as the context of the size is not known";
