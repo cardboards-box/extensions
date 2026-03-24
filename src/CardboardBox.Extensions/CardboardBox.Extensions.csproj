@@ -1,12 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>netstandard2.1;net7.0</TargetFrameworks>
+		<TargetFrameworks>net10.0</TargetFrameworks>
 		<LangVersion>latest</LangVersion>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<GenerateDocumentationFile>true</GenerateDocumentationFile>
-		<Version>2.0.3</Version>
 		<Company>Cardboard</Company>
 		<Product>CardboardBox.Extensions</Product>
 		<Authors>Cardboard</Authors>
@@ -20,9 +19,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="HtmlAgilityPack" Version="1.12.3" />
-		<PackageReference Include="System.Linq.Async" Version="6.0.3" />
-		<PackageReference Include="System.Text.Json" Version="9.0.9" />
+		<PackageReference Include="HtmlAgilityPack" Version="1.12.4" />
+		<PackageReference Include="System.Text.Json" Version="10.0.5" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -43,6 +43,12 @@ public abstract class BaseController(
 
         var watch = Stopwatch.StartNew();
         var id = Guid.NewGuid();
+        using var scope = Logger.BeginScope(new Dictionary<string, object>
+        {
+            ["RequestId"] = id,
+            ["RequestPath"] = Request.Path,
+            ["RequestMethod"] = Request.Method
+		});
         Boxed result;
 
         try
